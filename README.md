@@ -1,4 +1,4 @@
-A poor graduation design 
+A poor graduation design , which designed for automatic unpacking
 
 ### Dependency library
 
