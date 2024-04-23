@@ -1,4 +1,4 @@
-A poor graduation design , which designed for automatic unpacking
+A poor graduation design 
 
 ### Dependency library
 
@@ -23,7 +23,11 @@ https://docs.qiling.io/en/latest/install/
 
 ![image-20240422182213397](image/image-20240422182213397.png)
 
-3、enjoy it
+3、Replace the libloaderapi.py file in the directory below the qiling's libloaderapi.py file
+
+![image-20240423092955464](image/image-20240423092955464.png)
+
+4、enjoy it !!!
 
 ### Some progress so far
 
