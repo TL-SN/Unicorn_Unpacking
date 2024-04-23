@@ -42,6 +42,8 @@ def get_import_table_message(ql:Qiling,userdata:PeEmulation):
     from variable import debug_level
     if debug_level >= 1:
         pt_import_table_message()
+    else:
+        import_table_mess = hook_qiling_libloader()
 
     dump_exe_memory(ql = ql)  
     ql.emu_stop()
