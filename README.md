@@ -44,7 +44,7 @@ python main.py xxx.exe -m -1 -l 1 -t 1 -o x.exe 	# -t , address trace , so slow.
 
 demonstration:
 
-<video src="vidio/demonstration.mp4"></video>
+![bccb86d2-dd8b-4181-970f-9ffa5c8456f6](image/bccb86d2-dd8b-4181-970f-9ffa5c8456f6.gif)
 
 
 
