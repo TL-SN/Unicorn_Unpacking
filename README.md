@@ -25,6 +25,12 @@ official: https://docs.qiling.io/en/latest/install/
 
 
 
+Please download the roofs directory of qiling and copy it here:
+
+![image-20240520195715171](image/image-20240520195715171.png)
+
+
+
 ### How to use it
 
 The most commonly used command：
