@@ -27,6 +27,9 @@ WL_X64_RSP = "rsp"
 WL_X64_RIP = "rip"
 
 
+ESP_LAW_MODE = 1
+CROSS_SEGMENT_MODE = 2
+
 class iat_table:
     def __init__(self):
         self.dll_name = ""
@@ -41,3 +44,7 @@ class PeEmulation:
         self.hook_queue = {}
         self.seg_mess = []
         self.last_pc = 0
+        self.first_address = -1
+        self.Last_src_addr = -1
+        self.cross_segment_message = []
+        self.realoep = -1

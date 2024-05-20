@@ -3,16 +3,28 @@ from capstone import *
 import logging
 t_logger = None
 ROOTFS = "D:/Python/Environment/Python_3.87/install_pack_by_myself/qiling/examples/rootfs/x8664_windows"
-unpack_path = "bin/Selected_upx.exe"
-dump_path = "Selected_upx_unicorn.exe"
+pack_path = ""
+unpack_path = "xxx.exe"
 debug_level = 1
 Target_Mode = 0
 capstone_Arch = CS_ARCH_X86
 capstone_Mode = CS_MODE_64
+unicornPE = 0
+src_level_trace = 0
+unpacking_mode = 1
+tag_hooking_dll_loader = 0
 
-def set_unpack_path(path):
-    global unpack_path
-    unpack_path = path
+def debug(pt):
+    global t_logger
+    t_logger.debug(pt)
+
+def set_pack_path(path):
+    import shutil,os
+    global pack_path,ROOTFS
+    exe_name = os.path.basename(path)
+    pack_path = rf"{ROOTFS}/bin/{exe_name}"
+    shutil.copyfile(path, pack_path)
+    
 
 def set_ROOTFS(path="D:/Python/Environment/Python_3.87/install_pack_by_myself/qiling/examples/rootfs/x8664_windows"):
     global ROOTFS
@@ -43,9 +55,9 @@ def set_debug_level(debug = 1):
 
 
 
-def set_dump_path(path):
-    global dump_path
-    dump_path = path
+def set_unpack_path(path):
+    global unpack_path
+    unpack_path = path
 
 def set_Target_Mode(Mode):
     global Target_Mode
@@ -60,7 +72,7 @@ def set_capstone_Mode(Mode):
     capstone_Mode =Mode 
 
 def set_dependency_Arch_Mode(Mode):
-    set_Target_Mode(Mode=W_x86)
+    set_Target_Mode(Mode=Mode)
     if Mode == W_x86:
         set_capstone_Arch(CS_ARCH_X86)
         set_capstone_Mode(CS_MODE_32)
@@ -75,3 +87,20 @@ def set_dependency_Arch_Mode(Mode):
         set_capstone_Mode(CS_MODE_64)
 
 
+def set_unicorn_PE(tag):
+    global unicornPE
+    unicornPE = tag
+
+
+def set_src_trace(src_trace):
+    global src_level_trace
+    src_level_trace = src_trace
+
+def set_unpacking_mode(mode):
+    global unpacking_mode
+    unpacking_mode = mode
+
+def set_hooking_dll_loader(tag):
+    global tag_hooking_dll_loader
+    debug("set hooking dll loader")
+    tag_hooking_dll_loader = tag

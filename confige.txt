@@ -1,0 +1,1 @@
+ROOTFS_path=D:\Python\Environment\Python_3.87\install_pack_by_myself\qiling\examples\rootfs\x86_windows

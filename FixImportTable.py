@@ -42,24 +42,50 @@ def get_import_table_mess(pe_path ):
     return import_mess
 
 
+def find_file(root_folder, file_name:str):
+    import os
+    for root, dirs, files in os.walk(root_folder):
+        if file_name.upper() in files or file_name.lower() in files:
+            return os.path.join(root, file_name.lower())
+
+def get_funname_by_id(dll_name,id):
+    from variable import ROOTFS
+    dll_path = find_file(ROOTFS, dll_name)
+
+    dll = lief.parse(dll_path)
+    exports = dll.get_export()
+    ordinal = id
+    for export in exports.entries:
+        if export.ordinal == ordinal:
+            return export.name
+    else:
+        print("error id")
+        assert 0
+
+
+
+
 # 向IAT表中填入一个函数
 def add_new_fun_for_iat_table(pe,func_name,dll_name):
     library  = next((imp for imp in pe.imports if imp.name.lower() == dll_name.lower()), None)
 
     if library  is None:
         library = pe.add_library(dll_name )
-
+        
     if not any(entry.name == func_name for entry in library.entries):
-        library.add_entry(func_name)   
-                
+        if type(func_name) == type("tlsn"):
+            library.add_entry(func_name)   
+        else:
+            func_name = get_funname_by_id(dll_name=dll_name,id=func_name)
+            library.add_entry(func_name)
 
 def rebuild_import_table(pe):
 
-    from variable import dump_path
+    from variable import unpack_path
     builder = lief.PE.Builder(pe)
     builder.build_imports(True)  # 重建导入表
     builder.build()  # 应用修改
-    builder.write(dump_path)  # 写入到新的文件以保留原文件
+    builder.write(unpack_path)  # 写入到新的文件以保留原文件
 
 
 
@@ -69,7 +95,9 @@ def pt_import_table_mess(import_table_mess):
         for fun,addr in zip(iat_table.fun,iat_table.fun_addr):
             print(" ",fun," ",hex(addr))
 
+# 在加入导入表项之前还得移除导入表项
 def fix_import_table(pe,import_table_mess):
+    pe.remove_all_libraries()
     # import_table_mess = get_import_table_mess()
     for dll_base in import_table_mess:
         iat : iat_table= import_table_mess[dll_base]
@@ -87,11 +115,11 @@ def fix_import_table(pe,import_table_mess):
 def fix_fist_thunk(dump_path,import_table_mess):
     pe_lief = lief.parse(dump_path)
     foa_fixed_pointers = get_fist_thunk_list(dump_path,import_table_mess)
-
+    
     cnt = 0
     # print("the FirstThunk addr is :")
     
-    pe = pefile.PE(pe_lief.name)
+    pe = pefile.PE(dump_path)
     if not hasattr(pe, 'DIRECTORY_ENTRY_IMPORT'):
         # print("No import table found.")
         return
@@ -149,7 +177,7 @@ def pt_all_first_thunk(pe):
 
 
 # def add_section_to_pe(file_path, new_section_name, section_content, section_size, characteristics):    
-#     from variable import dump_path
+#     from variable import unpack_path
 #     pe = lief.parse(file_path)
 #     new_section = lief.PE.Section()
 #     new_section.name = new_section_name

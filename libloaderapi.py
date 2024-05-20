@@ -14,6 +14,7 @@ from qiling.os.windows.utils import has_lib_ext
 
 #################################################################################################################
 # hook qiling , the main task is hooking these api: LoadLibrary , GetProcAddress
+
 class iat_table:
     def __init__(self):
         self.dll_name = ""
@@ -39,7 +40,8 @@ def hook_qiling_libloader():
 
 def _GetModuleHandle(ql: Qiling, address: int, params):
     global import_table_message
-
+    from variable import tag_hooking_dll_loader
+    
     lpModuleName = params["lpModuleName"]
     if lpModuleName == 0:
         ret = ql.loader.pe_image_address
@@ -52,8 +54,8 @@ def _GetModuleHandle(ql: Qiling, address: int, params):
         if image:
 #########################################################################################
             # hook _GetModuleHandle
-            if ".dll" in lpModuleName: 
-
+            # if (".dll" in lpModuleName or ".DLL" in lpModuleName) and tag_hooking_dll_loader==1: 
+            if tag_hooking_dll_loader==1:
                 iat = iat_table()
                 iat.dll_base = image.base
                 iat.dll_load_addr = address
@@ -168,6 +170,7 @@ def hook_GetModuleFileNameW(ql: Qiling, address: int, params):
 })
 def hook_GetProcAddress(ql: Qiling, address: int, params):
     global import_table_message
+    from variable import tag_hooking_dll_loader
 
     hModule = params['hModule']
     lpProcName = params['lpProcName']
@@ -203,22 +206,25 @@ def hook_GetProcAddress(ql: Qiling, address: int, params):
     if lpProcName in iat:
 ##############################################################################333
         # hook GetProcAddress
-        dll_base = hModule
-        if dll_base in import_table_message:
-            h_iat:iat_table = import_table_message[dll_base]
-            new_lpProcName = lpProcName
-            if type(new_lpProcName) == type(b"tlsn"):
-                new_lpProcName = new_lpProcName.decode()
-
-            h_iat.fun_name.append(new_lpProcName)
-            h_iat.fun_addr.append(iat[lpProcName])
-            h_iat.fun_load_addr.append(address)
+        
+        if tag_hooking_dll_loader == 1:
+            dll_base = hModule
+            if dll_base in import_table_message:
+                h_iat:iat_table = import_table_message[dll_base]
+                new_lpProcName = lpProcName
+                if type(new_lpProcName) == type(b"tlsn"):
+                    new_lpProcName = new_lpProcName.decode()
+                if new_lpProcName not in h_iat.fun_name:
+                    h_iat.fun_name.append(new_lpProcName)
+                    h_iat.fun_addr.append(iat[lpProcName])
+                    h_iat.fun_load_addr.append(address)
 ##############################################################################
         return iat[lpProcName]
 
     return 0
 
 def _LoadLibrary(ql: Qiling, address: int, params):
+    from variable import tag_hooking_dll_loader
     lpLibFileName = params["lpLibFileName"]
 
     # TODO: this searches only by basename; do we need to search by full path as well?
@@ -228,19 +234,40 @@ def _LoadLibrary(ql: Qiling, address: int, params):
 
 ######################################################################
         # Hook qiling的LoadLibrary加载器
-        iat = iat_table()
-        iat.dll_name = lpLibFileName
-        iat.dll_base = dll.base
-        iat.dll_load_addr = address
-        import_table_message[dll.base] = iat
+        
+        if tag_hooking_dll_loader == 1:
+            iat = iat_table()
+            iat.dll_name = lpLibFileName
+            iat.dll_base = dll.base
+            iat.dll_load_addr = address
+            import_table_message[dll.base] = iat
 ###################################################################### 
         return dll.base
-
-    return ql.loader.load_dll(lpLibFileName)
+######################################################################
+    if tag_hooking_dll_loader == 1:
+        iat = iat_table()
+        iat.dll_name = lpLibFileName
+        iat.dll_base = ql.loader.load_dll(lpLibFileName)
+        iat.dll_load_addr = address
+        import_table_message[iat.dll_base] = iat
+        return iat.dll_base
+######################################################################
+    else:    
+        return ql.loader.load_dll(lpLibFileName)
 
 def _LoadLibraryEx(ql: Qiling, address: int, params):
+    from variable import tag_hooking_dll_loader
     lpLibFileName = params["lpLibFileName"]
-    return ql.loader.load_dll(lpLibFileName)
+    
+    if tag_hooking_dll_loader == 1:
+        iat = iat_table()
+        iat.dll_name = lpLibFileName
+        iat.dll_base = ql.loader.load_dll(lpLibFileName)
+        iat.dll_load_addr = address
+        import_table_message[iat.dll_base] = iat
+        return iat.dll_base
+    else:
+        return ql.loader.load_dll(lpLibFileName)
 
 # HMODULE LoadLibraryA(
 #   LPCSTR lpLibFileName

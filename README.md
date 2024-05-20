@@ -3,19 +3,19 @@ A poor graduation design
 ### Dependency library
 
 ```
-pip install qiling
-pip install unicorn
+pip install qiling					# Version: 1.4.4
+pip install unicorn					# Version: 2.0.0
 pip install capstone
-pip install lief
-pip install pefile
+pip install lief					# Version: 0.14.1
+pip install pefile 					# Version: 2022.5.30
 pip install argparse
 ```
 
 ### usage
 
-1、open main.py and set debug_level、unpack_path、dump_path、ROOTFS_path
+1、set ROOTFS_path
 
-![image-20240422182014916](image/image-20240422182014916.png)
+![image-20240520155842655](image/image-20240520155842655.png)
 
 2、Make sure you configure the qiling before you use it
 
@@ -23,11 +23,11 @@ https://docs.qiling.io/en/latest/install/
 
 ![image-20240422182213397](image/image-20240422182213397.png)
 
-3、Replace the libloaderapi.py file in the directory below the qiling's libloaderapi.py file
+3、patch qiling
 
-![image-20240423092955464](image/image-20240423092955464.png)
+![image-20240520155956131](image/image-20240520155956131.png)
 
-4、enjoy it !!!
+4、enjoy it
 
 ### Some progress so far
 
