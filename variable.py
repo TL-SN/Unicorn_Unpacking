@@ -2,7 +2,7 @@ from variable_const import *
 from capstone import *
 import logging
 t_logger = None
-ROOTFS = "D:/Python/Environment/Python_3.87/install_pack_by_myself/qiling/examples/rootfs/x8664_windows"
+ROOTFS = ""
 pack_path = ""
 unpack_path = "xxx.exe"
 debug_level = 1
@@ -23,10 +23,9 @@ def set_pack_path(path):
     global pack_path,ROOTFS
     exe_name = os.path.basename(path)
     pack_path = rf"{ROOTFS}/bin/{exe_name}"
-    shutil.copyfile(path, pack_path)
-    
+    shutil.copyfile(path, pack_path)  
 
-def set_ROOTFS(path="D:/Python/Environment/Python_3.87/install_pack_by_myself/qiling/examples/rootfs/x8664_windows"):
+def set_ROOTFS(path=""):
     global ROOTFS
     ROOTFS = path
 
